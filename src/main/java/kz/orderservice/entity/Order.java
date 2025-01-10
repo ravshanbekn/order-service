@@ -38,10 +38,10 @@ public class Order {
     @Column(name = "total_price", nullable = false)
     private Double totalPrice;
 
-    @Column(name = "is_active", nullable = false)
-    private Boolean isActive;
-
     @OneToMany
     @JoinColumn(name = "order_id")
     private List<Product> products;
+
+    @Column(name = "is_deleted", nullable = false)
+    private Boolean isDeleted;
 }
