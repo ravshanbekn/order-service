@@ -1,5 +1,6 @@
 package kz.orderservice.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -29,7 +30,7 @@ public class Order {
     private Long orderId;
 
     @Column(name = "customer_name", nullable = false)
-    private String curtomerName;
+    private String customerName;
 
     @Enumerated(value = EnumType.STRING)
     @Column(name = "status", nullable = false)
@@ -38,7 +39,7 @@ public class Order {
     @Column(name = "total_price", nullable = false)
     private Double totalPrice;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "order_id")
     private List<Product> products;
 
