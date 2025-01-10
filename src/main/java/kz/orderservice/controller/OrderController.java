@@ -9,12 +9,16 @@ import kz.orderservice.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/orders")
@@ -35,5 +39,13 @@ public class OrderController {
                                                         @RequestBody @Valid @NotNull OrderRequestDto orderRequestDto) {
         return ResponseEntity
                 .ok(orderService.updateOrder(orderId, orderRequestDto));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<OrderResponseDto>> getOrders(@RequestParam(required = false) String status,
+                                                            @RequestParam(required = false) Double minPrice,
+                                                            @RequestParam(required = false) Double maxPrice) {
+        return ResponseEntity
+                .ok(orderService.getOrdersWithFilters(status, minPrice, maxPrice));
     }
 }
