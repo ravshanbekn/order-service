@@ -1,6 +1,7 @@
 package kz.orderservice.service;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.criteria.Predicate;
 import kz.orderservice.converter.OrderConverter;
 import kz.orderservice.converter.ProductConverter;
 import kz.orderservice.dto.order.OrderRequestDto;
@@ -12,6 +13,7 @@ import kz.orderservice.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -42,6 +44,29 @@ public class OrderService {
         return orderConverter.entityToResponseDto(orderRepository.save(order));
     }
 
+    public List<OrderResponseDto> getOrdersWithFilters(String status, Double minPrice, Double maxPrice) {
+        List<Order> appropriateOrders = orderRepository.findAll((root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            if (status != null) {
+                predicates.add(criteriaBuilder.equal(root.get("status"), OrderStatus.fromString(status)));
+            }
+
+            if (minPrice != null) {
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("totalPrice"), minPrice));
+            }
+
+            if (maxPrice != null) {
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("totalPrice"), maxPrice));
+            }
+
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        });
+
+        return appropriateOrders.stream()
+                .map(orderConverter::entityToResponseDto)
+                .toList();
+    }
 
     private double calculateTotalPrice(List<Product> products) {
         return products.stream()
