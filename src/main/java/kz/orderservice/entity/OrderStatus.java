@@ -18,6 +18,6 @@ public enum OrderStatus {
                 return status;
             }
         }
-        return null;
+        throw new IllegalArgumentException("Could not find appropriate order status for: " + text);
     }
 }

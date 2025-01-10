@@ -1,6 +1,8 @@
 package kz.orderservice.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import kz.orderservice.converter.OrderConverter;
+import kz.orderservice.converter.ProductConverter;
 import kz.orderservice.dto.order.OrderRequestDto;
 import kz.orderservice.dto.order.OrderResponseDto;
 import kz.orderservice.entity.Order;
@@ -17,14 +19,27 @@ import java.util.List;
 public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderConverter orderConverter;
+    private final ProductConverter productConverter;
 
     public OrderResponseDto createOrder(OrderRequestDto orderRequestDto) {
         Order order = orderConverter.requestDtoToEntity(orderRequestDto);
-        order.setStatus(OrderStatus.PENDING);
-        order.setTotalPrice(calculateTotalPrice(order.getProducts()));
         order.setIsDeleted(false);
-        Order savedOrder = orderRepository.save(order);
-        return orderConverter.entityToResponseDto(savedOrder);
+        order.setTotalPrice(calculateTotalPrice(order.getProducts()));
+        return orderConverter.entityToResponseDto(orderRepository.save(order));
+    }
+
+    public OrderResponseDto updateOrder(Long orderId, OrderRequestDto orderRequestDto) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new EntityNotFoundException("Could not find order by supplied id: " + orderId));
+
+        order.setStatus(OrderStatus.fromString(orderRequestDto.getOrderStatus()));
+        List<Product> products = order.getProducts();
+        products.clear();
+        orderRequestDto.getProducts().stream()
+                .map(productConverter::requestDtoToEntity)
+                .forEach(products::add);
+        order.setTotalPrice(calculateTotalPrice(order.getProducts()));
+        return orderConverter.entityToResponseDto(orderRepository.save(order));
     }
 
 
