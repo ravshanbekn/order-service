@@ -68,6 +68,13 @@ public class OrderService {
                 .toList();
     }
 
+    public void softDeleteOrder(Long orderId){
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Could not find order by id: " + orderId));
+        order.setIsDeleted(true);
+        orderRepository.save(order);
+    }
+
     private double calculateTotalPrice(List<Product> products) {
         return products.stream()
                 .mapToDouble(product -> product.getPrice() * product.getQuantity())
