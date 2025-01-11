@@ -13,3 +13,10 @@ spring:
 
 server:
   port: 8080
+
+jwt:
+  secret-key: 5F1B7C4A8E0B5D1A22B1D8C1E4A4F3B5D6D3FAE7C8B9D4F2A1B6C3E5F7A8E9D1
+  access-token-lifetime: 86400000
+  auth-filter:
+    bearer-prefix: "Bearer "
+    header-name: "Authorization"
