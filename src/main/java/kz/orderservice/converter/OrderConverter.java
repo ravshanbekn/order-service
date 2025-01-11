@@ -15,7 +15,6 @@ public class OrderConverter {
     public Order requestDtoToEntity(OrderRequestDto orderRequestDto) {
         Order order = new Order();
         order.setStatus(OrderStatus.fromString(orderRequestDto.getOrderStatus()));
-        order.setCustomerName(orderRequestDto.getCustomerName());
         order.setProducts(
                 orderRequestDto.getProducts().stream()
                         .map(productConverter::requestDtoToEntity).toList());

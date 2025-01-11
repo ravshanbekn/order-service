@@ -11,6 +11,8 @@ import kz.orderservice.entity.OrderStatus;
 import kz.orderservice.entity.Product;
 import kz.orderservice.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -26,6 +28,9 @@ public class OrderService {
     public OrderResponseDto createOrder(OrderRequestDto orderRequestDto) {
         Order order = orderConverter.requestDtoToEntity(orderRequestDto);
         order.setIsDeleted(false);
+        String username = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
+                .getUsername();
+        order.setCustomerName(username);
         order.setTotalPrice(calculateTotalPrice(order.getProducts()));
         return orderConverter.entityToResponseDto(orderRepository.save(order));
     }
@@ -71,7 +76,11 @@ public class OrderService {
     public OrderResponseDto getOrderById(Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new EntityNotFoundException("Could not find order by id: " + orderId));
-        // todo: implement visibility validation
+        String username = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
+                .getUsername();
+        if (!order.getCustomerName().equals(username)) {
+            throw new IllegalArgumentException("Could not get access to order with id: " + orderId);
+        }
         return orderConverter.entityToResponseDto(order);
     }
 
