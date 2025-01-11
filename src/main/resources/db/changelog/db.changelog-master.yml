@@ -9,3 +9,5 @@ databaseChangeLog:
       file: db/changelog/changeset/V004_update_table_products.sql
   - include:
       file: db/changelog/changeset/V005_update_table_products.sql
+  - include:
+      file: db/changelog/changeset/V006_create_table_users.sql
