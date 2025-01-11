@@ -11,6 +11,9 @@ import kz.orderservice.entity.OrderStatus;
 import kz.orderservice.entity.Product;
 import kz.orderservice.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -25,6 +28,7 @@ public class OrderService {
     private final OrderConverter orderConverter;
     private final ProductConverter productConverter;
 
+    @Cacheable(cacheNames = "order")
     public OrderResponseDto createOrder(OrderRequestDto orderRequestDto) {
         Order order = orderConverter.requestDtoToEntity(orderRequestDto);
         order.setIsDeleted(false);
@@ -35,6 +39,7 @@ public class OrderService {
         return orderConverter.entityToResponseDto(orderRepository.save(order));
     }
 
+    @CachePut(cacheNames = "order")
     public OrderResponseDto updateOrder(Long orderId, OrderRequestDto orderRequestDto) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new EntityNotFoundException("Could not find order by supplied id: " + orderId));
@@ -64,7 +69,7 @@ public class OrderService {
             if (maxPrice != null) {
                 predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("totalPrice"), maxPrice));
             }
-
+            predicates.add(criteriaBuilder.isFalse(root.get("isDeleted")));
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         });
 
@@ -73,8 +78,9 @@ public class OrderService {
                 .toList();
     }
 
+    @Cacheable(cacheNames = "order")
     public OrderResponseDto getOrderById(Long orderId) {
-        Order order = orderRepository.findById(orderId)
+        Order order = orderRepository.findByOrderIdAndIsDeletedFalse(orderId)
                 .orElseThrow(() -> new EntityNotFoundException("Could not find order by id: " + orderId));
         String username = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
                 .getUsername();
@@ -84,6 +90,7 @@ public class OrderService {
         return orderConverter.entityToResponseDto(order);
     }
 
+    @CacheEvict(cacheNames = "order")
     public void softDeleteOrder(Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Could not find order by id: " + orderId));
