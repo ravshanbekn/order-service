@@ -68,7 +68,14 @@ public class OrderService {
                 .toList();
     }
 
-    public void softDeleteOrder(Long orderId){
+    public OrderResponseDto getOrderById(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new EntityNotFoundException("Could not find order by id: " + orderId));
+        // todo: implement visibility validation
+        return orderConverter.entityToResponseDto(order);
+    }
+
+    public void softDeleteOrder(Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Could not find order by id: " + orderId));
         order.setIsDeleted(true);

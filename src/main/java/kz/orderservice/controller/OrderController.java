@@ -50,6 +50,12 @@ public class OrderController {
                 .ok(orderService.getOrdersWithFilters(status, minPrice, maxPrice));
     }
 
+    @GetMapping("/{orderId}")
+    public ResponseEntity<OrderResponseDto> getOrders(@PathVariable Long orderId) {
+        return ResponseEntity
+                .ok(orderService.getOrderById(orderId));
+    }
+
     @DeleteMapping("/{orderId}")
     public ResponseEntity<Void> softDeleteOrder(@PathVariable Long orderId) {
         orderService.softDeleteOrder(orderId);
