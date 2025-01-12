@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AuthenticationResponse {
+public class AuthenticationResponseDto {
 
     @Schema(description = "JWT token generated upon successful authentication",
             example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqb2huZG9lIiwiaWF0IjoxNjg2MjQ2ODAwLCJleHAiOjE2ODYyNTA0MDB9.Pq7H3oMe-FJwAX2NO_3XTNNkB5yCmYnSPZVfD2kUIxU")

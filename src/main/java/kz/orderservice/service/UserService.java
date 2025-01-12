@@ -2,10 +2,10 @@ package kz.orderservice.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import kz.orderservice.converter.UserConverter;
-import kz.orderservice.dto.auth.AuthenticationRequest;
-import kz.orderservice.dto.auth.AuthenticationResponse;
-import kz.orderservice.dto.auth.RegisterRequest;
-import kz.orderservice.dto.auth.RegisterResponse;
+import kz.orderservice.dto.auth.AuthenticationRequestDto;
+import kz.orderservice.dto.auth.AuthenticationResponseDto;
+import kz.orderservice.dto.auth.RegisterRequestDto;
+import kz.orderservice.dto.auth.RegisterResponseDto;
 import kz.orderservice.entity.user.Role;
 import kz.orderservice.entity.user.User;
 import kz.orderservice.repository.UserRepository;
@@ -25,27 +25,27 @@ public class UserService {
     private final UserRepository userRepository;
     private final AuthenticationManager authenticationManager;
 
-    public RegisterResponse register(RegisterRequest registerRequest) {
-        if (userRepository.existsByUsername(registerRequest.getUsername())) {
+    public RegisterResponseDto register(RegisterRequestDto registerRequestDto) {
+        if (userRepository.existsByUsername(registerRequestDto.getUsername())) {
             throw new IllegalArgumentException("User with username: %s already exists"
-                    .formatted(registerRequest.getUsername()) );
+                    .formatted(registerRequestDto.getUsername()) );
         }
-        User user = userConverter.registerRequestToEntity(registerRequest);
+        User user = userConverter.registerRequestToEntity(registerRequestDto);
         User savedUser = userRepository.save(user);
         return userConverter.entityToRegisterResponse(savedUser);
     }
 
-    public AuthenticationResponse authenticate(AuthenticationRequest authenticationRequest) {
+    public AuthenticationResponseDto authenticate(AuthenticationRequestDto authenticationRequestDto) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        authenticationRequest.getUsername(),
-                        authenticationRequest.getPassword()
+                        authenticationRequestDto.getUsername(),
+                        authenticationRequestDto.getPassword()
                 )
         );
-        User user = userRepository.findByUsername(authenticationRequest.getUsername())
-                .orElseThrow(() -> new EntityNotFoundException("Could not find user by username: " + authenticationRequest.getPassword()));
+        User user = userRepository.findByUsername(authenticationRequestDto.getUsername())
+                .orElseThrow(() -> new EntityNotFoundException("Could not find user by username: " + authenticationRequestDto.getPassword()));
         String jwtToken = jwtService.generateToken(user);
-        return AuthenticationResponse.builder()
+        return AuthenticationResponseDto.builder()
                 .token(jwtToken)
                 .build();
     }
