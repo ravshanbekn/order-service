@@ -8,3 +8,16 @@ services:
       POSTGRES_PASSWORD: "postgres"
     ports:
       - "5432:5432"
+
+  order-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://order-service-postgres:5432/order_service_postgres_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    depends_on:
+      - order-service-postgres
+    ports:
+      - "8080:8080"

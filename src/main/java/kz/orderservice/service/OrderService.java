@@ -30,7 +30,6 @@ public class OrderService {
     private final OrderConverter orderConverter;
     private final ProductConverter productConverter;
 
-    @Cacheable(cacheNames = "order")
     public OrderResponseDto createOrder(OrderRequestDto orderRequestDto) {
         Order order = orderConverter.requestDtoToEntity(orderRequestDto);
 
