@@ -44,7 +44,7 @@ public class OrderService {
         return orderConverter.entityToResponseDto(savedOrder);
     }
 
-    @CachePut(cacheNames = "order")
+    @CachePut(cacheNames = "order", key = "#orderId")
     public OrderResponseDto updateOrder(Long orderId, OrderRequestDto orderRequestDto) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new EntityNotFoundException("Could not find order by supplied id: " + orderId));
@@ -87,7 +87,7 @@ public class OrderService {
                 .toList();
     }
 
-    @Cacheable(cacheNames = "order")
+    @Cacheable(cacheNames = "order", key = "#orderId")
     public OrderResponseDto getOrderById(Long orderId) {
         Order order = orderRepository.findByOrderIdAndIsDeletedFalse(orderId)
                 .orElseThrow(() -> new EntityNotFoundException("Could not find order by id: " + orderId));
@@ -95,7 +95,7 @@ public class OrderService {
         return orderConverter.entityToResponseDto(order);
     }
 
-    @CacheEvict(cacheNames = "order")
+    @CacheEvict(cacheNames = "order", key = "#orderId")
     public void softDeleteOrder(Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new EntityNotFoundException("Could not find order by id: " + orderId));
