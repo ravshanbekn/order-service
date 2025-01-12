@@ -1,5 +1,6 @@
 package kz.orderservice.controller;
 
+import jakarta.validation.Valid;
 import kz.orderservice.dto.auth.AuthenticationRequest;
 import kz.orderservice.dto.auth.AuthenticationResponse;
 import kz.orderservice.dto.auth.RegisterRequest;
@@ -19,13 +20,13 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<RegisterResponse> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<RegisterResponse> register(@RequestBody @Valid RegisterRequest request) {
         return ResponseEntity
                 .ok(userService.register(request));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request) {
+    public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody @Valid AuthenticationRequest request) {
         return ResponseEntity
                 .ok(userService.authenticate(request));
     }

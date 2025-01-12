@@ -2,7 +2,6 @@ package kz.orderservice.controller;
 
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import kz.orderservice.dto.order.OrderRequestDto;
 import kz.orderservice.dto.order.OrderResponseDto;
 import kz.orderservice.service.OrderService;
@@ -29,7 +28,7 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping
-    public ResponseEntity<OrderResponseDto> createOrder(@RequestBody @Valid @NotNull OrderRequestDto orderRequestDto) {
+    public ResponseEntity<OrderResponseDto> createOrder(@RequestBody @Valid OrderRequestDto orderRequestDto) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(orderService.createOrder(orderRequestDto));
@@ -37,7 +36,7 @@ public class OrderController {
 
     @PutMapping("/{orderId}")
     public ResponseEntity<OrderResponseDto> updateOrder(@PathVariable Long orderId,
-                                                        @RequestBody @Valid @NotNull OrderRequestDto orderRequestDto) {
+                                                        @RequestBody @Valid OrderRequestDto orderRequestDto) {
         return ResponseEntity
                 .ok(orderService.updateOrder(orderId, orderRequestDto));
     }
