@@ -13,7 +13,6 @@ import kz.orderservice.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -44,7 +43,7 @@ public class OrderService {
         return orderConverter.entityToResponseDto(savedOrder);
     }
 
-    @CachePut(cacheNames = "order")
+    @CacheEvict(value = "orders", key = "#orderId")
     public OrderResponseDto updateOrder(Long orderId, OrderRequestDto orderRequestDto) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new EntityNotFoundException("Could not find order by supplied id: " + orderId));
@@ -87,15 +86,16 @@ public class OrderService {
                 .toList();
     }
 
-    @Cacheable(cacheNames = "order")
+    @Cacheable(value = "orders", key = "#orderId")
     public OrderResponseDto getOrderById(Long orderId) {
         Order order = orderRepository.findByOrderIdAndIsDeletedFalse(orderId)
                 .orElseThrow(() -> new EntityNotFoundException("Could not find order by id: " + orderId));
         validateAccessToOrder(order);
+        log.info("Got order by id:" + orderId);
         return orderConverter.entityToResponseDto(order);
     }
 
-    @CacheEvict(cacheNames = "order")
+    @CacheEvict(value = "orders", key = "#orderId")
     public void softDeleteOrder(Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new EntityNotFoundException("Could not find order by id: " + orderId));
@@ -110,7 +110,7 @@ public class OrderService {
                 .sum();
     }
 
-    private void validateAccessToOrder(Order order){
+    private void validateAccessToOrder(Order order) {
         String username = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
                 .getUsername();
         if (!order.getCustomerName().equals(username)) {
