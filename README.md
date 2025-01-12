@@ -16,7 +16,7 @@ This project is built using the following technologies:
 
 ### Security
 - Spring Security
-- JWT (io.jsonwebtoken:jjwt-api, io.jsonwebtoken:jjwt-impl, io.jsonwebtoken:jjwt-jackson)
+- JWT
 
 ### Testing
 - Spring Boot Test
@@ -48,7 +48,7 @@ This project is built using the following technologies:
 3. Build the project:
 
     ```bash
-    ./gradlew build
+    gradlew build
     ```
 
 4. Run the application using Docker Compose:
@@ -73,4 +73,7 @@ This project is built using the following technologies:
    In the Swagger UI, click on the "Authorize" button. A dialog will appear where you can enter the JWT token you received in the login step. Paste the token into the input field and click "Authorize."
 
 5. **Access Admin Role (Optional)**  
-   If needed, you can obtain an admin role by using the `/admin` endpoint. Ensure that you have the proper permissions or role to access this endpoint.
+   If needed, you can obtain an admin role by using the `/admin` endpoint.
+
+6. **Use Other APIs**  
+   You can now explore and use other available API endpoints in the Swagger UI.
