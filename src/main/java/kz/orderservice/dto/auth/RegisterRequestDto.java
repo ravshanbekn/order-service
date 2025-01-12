@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RegisterRequest {
+public class RegisterRequestDto {
     @NotBlank(message = "Username should not be blank")
     @Schema(description = "The username for authentication", example = "John", requiredMode = Schema.RequiredMode.REQUIRED)
     private String username;

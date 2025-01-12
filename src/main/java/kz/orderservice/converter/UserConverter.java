@@ -1,7 +1,7 @@
 package kz.orderservice.converter;
 
-import kz.orderservice.dto.auth.RegisterRequest;
-import kz.orderservice.dto.auth.RegisterResponse;
+import kz.orderservice.dto.auth.RegisterRequestDto;
+import kz.orderservice.dto.auth.RegisterResponseDto;
 import kz.orderservice.entity.user.Role;
 import kz.orderservice.entity.user.User;
 import lombok.RequiredArgsConstructor;
@@ -14,16 +14,16 @@ public class UserConverter {
 
     private final PasswordEncoder passwordEncoder;
 
-    public User registerRequestToEntity(RegisterRequest registerRequest) {
+    public User registerRequestToEntity(RegisterRequestDto registerRequestDto) {
         return User.builder()
-                .username(registerRequest.getUsername())
-                .password(passwordEncoder.encode(registerRequest.getPassword()))
+                .username(registerRequestDto.getUsername())
+                .password(passwordEncoder.encode(registerRequestDto.getPassword()))
                 .role(Role.USER)
                 .build();
     }
 
-    public RegisterResponse entityToRegisterResponse(User user) {
-        return RegisterResponse.builder()
+    public RegisterResponseDto entityToRegisterResponse(User user) {
+        return RegisterResponseDto.builder()
                 .id(user.getId())
                 .username(user.getUsername())
                 .role(user.getRole())

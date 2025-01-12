@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RegisterResponse {
+public class RegisterResponseDto {
 
     @Schema(description = "Unique identifier of the registered user", example = "1")
     private Long id;

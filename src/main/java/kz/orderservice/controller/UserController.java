@@ -6,10 +6,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import kz.orderservice.dto.ErrorResponseDto;
-import kz.orderservice.dto.auth.AuthenticationRequest;
-import kz.orderservice.dto.auth.AuthenticationResponse;
-import kz.orderservice.dto.auth.RegisterRequest;
-import kz.orderservice.dto.auth.RegisterResponse;
+import kz.orderservice.dto.auth.AuthenticationRequestDto;
+import kz.orderservice.dto.auth.AuthenticationResponseDto;
+import kz.orderservice.dto.auth.RegisterRequestDto;
+import kz.orderservice.dto.auth.RegisterResponseDto;
 import kz.orderservice.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -30,14 +30,14 @@ public class UserController {
             responses = {
                     @ApiResponse(responseCode = "200", description = "User successfully registered",
                             content = @Content(
-                                    schema = @Schema(implementation = RegisterResponse.class))),
+                                    schema = @Schema(implementation = RegisterResponseDto.class))),
                     @ApiResponse(responseCode = "400", description = "Invalid registration data",
                             content = @Content(
                                     schema = @Schema(implementation = ErrorResponseDto.class)))
             }
     )
     @PostMapping("/register")
-    public ResponseEntity<RegisterResponse> register(@RequestBody @Valid RegisterRequest request) {
+    public ResponseEntity<RegisterResponseDto> register(@RequestBody @Valid RegisterRequestDto request) {
         return ResponseEntity
                 .ok(userService.register(request));
     }
@@ -48,14 +48,14 @@ public class UserController {
             responses = {
                     @ApiResponse(responseCode = "200", description = "Authentication successful",
                             content = @Content(
-                                    schema = @Schema(implementation = AuthenticationResponse.class))),
+                                    schema = @Schema(implementation = AuthenticationResponseDto.class))),
                     @ApiResponse(responseCode = "400", description = "Invalid login credentials",
                             content = @Content(
                                     schema = @Schema(implementation = ErrorResponseDto.class)))
             }
     )
     @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody @Valid AuthenticationRequest request) {
+    public ResponseEntity<AuthenticationResponseDto> authenticate(@RequestBody @Valid AuthenticationRequestDto request) {
         return ResponseEntity
                 .ok(userService.authenticate(request));
     }
