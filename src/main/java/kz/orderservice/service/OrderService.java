@@ -13,7 +13,6 @@ import kz.orderservice.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -44,7 +43,7 @@ public class OrderService {
         return orderConverter.entityToResponseDto(savedOrder);
     }
 
-    @CachePut(cacheNames = "order", key = "#orderId")
+    @CacheEvict(cacheNames = "order", key = "#orderId")
     public OrderResponseDto updateOrder(Long orderId, OrderRequestDto orderRequestDto) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new EntityNotFoundException("Could not find order by supplied id: " + orderId));
@@ -110,7 +109,7 @@ public class OrderService {
                 .sum();
     }
 
-    private void validateAccessToOrder(Order order){
+    private void validateAccessToOrder(Order order) {
         String username = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
                 .getUsername();
         if (!order.getCustomerName().equals(username)) {
