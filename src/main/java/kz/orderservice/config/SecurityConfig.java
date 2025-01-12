@@ -28,7 +28,8 @@ public class SecurityConfig {
         http
                 .csrf(CsrfConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/register", "/login").permitAll()
+                        .requestMatchers("/register", "/login", "/v3/api-docs/**", "/swagger-ui/**",
+                                "/swagger-ui.html", "/webjars/**").permitAll()
                         .requestMatchers(PUT, "/admin").hasAnyAuthority(Role.USER.name(), Role.ADMIN.name())
                         .requestMatchers(POST, "/orders").hasAnyAuthority(Role.USER.name(), Role.ADMIN.name())
                         .requestMatchers(PUT, "/orders/**").hasAnyAuthority(Role.USER.name(), Role.ADMIN.name())
