@@ -49,6 +49,7 @@ public class OrderService {
     public OrderResponseDto updateOrder(Long orderId, OrderRequestDto orderRequestDto) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new EntityNotFoundException("Could not find order by supplied id: " + orderId));
+        validateAccessToOrder(order);
 
         order.setStatus(OrderStatus.fromString(orderRequestDto.getOrderStatus()));
         List<Product> products = order.getProducts();
@@ -91,11 +92,7 @@ public class OrderService {
     public OrderResponseDto getOrderById(Long orderId) {
         Order order = orderRepository.findByOrderIdAndIsDeletedFalse(orderId)
                 .orElseThrow(() -> new EntityNotFoundException("Could not find order by id: " + orderId));
-        String username = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
-                .getUsername();
-        if (!order.getCustomerName().equals(username)) {
-            throw new IllegalArgumentException("Could not get access to order with id: " + orderId);
-        }
+        validateAccessToOrder(order);
         return orderConverter.entityToResponseDto(order);
     }
 
@@ -112,5 +109,13 @@ public class OrderService {
         return products.stream()
                 .mapToDouble(product -> product.getPrice() * product.getQuantity())
                 .sum();
+    }
+
+    private void validateAccessToOrder(Order order){
+        String username = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
+                .getUsername();
+        if (!order.getCustomerName().equals(username)) {
+            throw new IllegalArgumentException("Could not get access to order with id: " + order.getOrderId());
+        }
     }
 }

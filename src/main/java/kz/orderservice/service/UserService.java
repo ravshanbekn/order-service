@@ -26,6 +26,10 @@ public class UserService {
     private final AuthenticationManager authenticationManager;
 
     public RegisterResponse register(RegisterRequest registerRequest) {
+        if (userRepository.existsByUsername(registerRequest.getUsername())) {
+            throw new IllegalArgumentException("User with username: %s already exists"
+                    .formatted(registerRequest.getUsername()) );
+        }
         User user = userConverter.registerRequestToEntity(registerRequest);
         User savedUser = userRepository.save(user);
         return userConverter.entityToRegisterResponse(savedUser);
@@ -46,7 +50,7 @@ public class UserService {
                 .build();
     }
 
-    public void provideAdminRole(){
+    public void provideAdminRole() {
         String username = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
                 .getUsername();
         User user = userRepository.findByUsername(username)
