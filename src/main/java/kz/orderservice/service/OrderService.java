@@ -11,6 +11,7 @@ import kz.orderservice.entity.OrderStatus;
 import kz.orderservice.entity.Product;
 import kz.orderservice.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class OrderService {
     private final OrderRepository orderRepository;
@@ -31,12 +33,16 @@ public class OrderService {
     @Cacheable(cacheNames = "order")
     public OrderResponseDto createOrder(OrderRequestDto orderRequestDto) {
         Order order = orderConverter.requestDtoToEntity(orderRequestDto);
+
         order.setIsDeleted(false);
         String username = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
                 .getUsername();
         order.setCustomerName(username);
         order.setTotalPrice(calculateTotalPrice(order.getProducts()));
-        return orderConverter.entityToResponseDto(orderRepository.save(order));
+
+        Order savedOrder = orderRepository.save(order);
+        log.info("Order created with ID: {}", order.getOrderId());
+        return orderConverter.entityToResponseDto(savedOrder);
     }
 
     @CachePut(cacheNames = "order")
@@ -51,7 +57,10 @@ public class OrderService {
                 .map(productConverter::requestDtoToEntity)
                 .forEach(products::add);
         order.setTotalPrice(calculateTotalPrice(order.getProducts()));
-        return orderConverter.entityToResponseDto(orderRepository.save(order));
+
+        Order updatedOrder = orderRepository.save(order);
+        log.info("Order updated with ID: {}", orderId);
+        return orderConverter.entityToResponseDto(updatedOrder);
     }
 
     public List<OrderResponseDto> getOrdersWithFilters(String status, Double minPrice, Double maxPrice) {
@@ -93,9 +102,10 @@ public class OrderService {
     @CacheEvict(cacheNames = "order")
     public void softDeleteOrder(Long orderId) {
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new IllegalArgumentException("Could not find order by id: " + orderId));
+                .orElseThrow(() -> new EntityNotFoundException("Could not find order by id: " + orderId));
         order.setIsDeleted(true);
         orderRepository.save(order);
+        log.info("Order soft-deleted with ID: {}", orderId);
     }
 
     private double calculateTotalPrice(List<Product> products) {
