@@ -46,10 +46,17 @@ This project is built using the following technologies:
     ```
 
 3. Build the project:
-
-    ```bash
-    gradlew clean build
-    ```
+  3.1 For Linux:
+  ```bash
+  sudo apt update
+  sudo apt install gradle
+  chmod +x gradlew
+  ./gradlew clean build
+  ```
+  3.2 For Windows: Install gradle and run:
+  ```bash
+  gradlew clean build
+  ```
 
 4. Run the application using Docker Compose:
 
