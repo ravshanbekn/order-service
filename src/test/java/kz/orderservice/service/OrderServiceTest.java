@@ -167,7 +167,7 @@ class OrderServiceTest {
     @Test
     @DisplayName("Testing updateOrder method for successful execution")
     void testUpdateOrder() {
-        when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
+        when(orderRepository.findByOrderIdAndIsDeletedFalse(orderId)).thenReturn(Optional.of(order));
         when(orderRepository.save(order)).thenReturn(order);
         when(orderConverter.entityToResponseDto(order)).thenReturn(orderResponseDto);
         when(productConverter.requestDtoToEntity(productRequestDto)).thenReturn(updatedProduct);
@@ -180,7 +180,7 @@ class OrderServiceTest {
 
             orderService.updateOrder(orderId, updatedOrderRequestDto);
 
-            verify(orderRepository, times(1)).findById(orderId);
+            verify(orderRepository, times(1)).findByOrderIdAndIsDeletedFalse(orderId);
             verify(orderRepository, times(1)).save(order);
             verify(orderConverter, times(1)).entityToResponseDto(order);
 
@@ -192,18 +192,18 @@ class OrderServiceTest {
     @Test
     @DisplayName("Testing updateOrder method when order is not found")
     void testUpdateOrderWhenOrderIsNotFound() {
-        when(orderRepository.findById(orderId)).thenReturn(Optional.empty());
+        when(orderRepository.findByOrderIdAndIsDeletedFalse(orderId)).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class, () -> orderService.updateOrder(orderId, updatedOrderRequestDto));
 
-        verify(orderRepository, times(1)).findById(orderId);
+        verify(orderRepository, times(1)).findByOrderIdAndIsDeletedFalse(orderId);
     }
 
     @Test
     @DisplayName("Testing updateOrder method when order does not belong to requester")
     void testUpdateOrderWhenOrderDoesNotBelongToRequester() {
         String realOrderOwner = "realOwner";
-        when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
+        when(orderRepository.findByOrderIdAndIsDeletedFalse(orderId)).thenReturn(Optional.of(order));
 
         try (MockedStatic<SecurityContextHolder> securityContextHolderMock = Mockito.mockStatic(SecurityContextHolder.class)) {
             securityContextHolderMock.when(SecurityContextHolder::getContext).thenReturn(securityContextMock);
@@ -213,7 +213,7 @@ class OrderServiceTest {
 
             assertThrows(IllegalArgumentException.class, () -> orderService.updateOrder(orderId, updatedOrderRequestDto));
 
-            verify(orderRepository, times(1)).findById(orderId);
+            verify(orderRepository, times(1)).findByOrderIdAndIsDeletedFalse(orderId);
         }
     }
 
@@ -290,11 +290,11 @@ class OrderServiceTest {
     @Test
     @DisplayName("Testing softDeleteOrder method for successful execution")
     void testSoftDeleteOrder() {
-        when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
+        when(orderRepository.findByOrderIdAndIsDeletedFalse(orderId)).thenReturn(Optional.of(order));
 
         orderService.softDeleteOrder(orderId);
 
-        verify(orderRepository, times(1)).findById(orderId);
+        verify(orderRepository, times(1)).findByOrderIdAndIsDeletedFalse(orderId);
         verify(orderRepository, times(1)).save(order);
         assertTrue(order.getIsDeleted());
     }
@@ -302,10 +302,10 @@ class OrderServiceTest {
     @Test
     @DisplayName("Testing softDeleteOrder method when order is not found")
     void testSoftDeleteOrderWhenOrderIsNotFound() {
-        when(orderRepository.findById(orderId)).thenReturn(Optional.empty());
+        when(orderRepository.findByOrderIdAndIsDeletedFalse(orderId)).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class, () -> orderService.softDeleteOrder(orderId));
 
-        verify(orderRepository, times(1)).findById(orderId);
+        verify(orderRepository, times(1)).findByOrderIdAndIsDeletedFalse(orderId);
     }
 }
