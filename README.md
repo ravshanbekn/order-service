@@ -48,7 +48,7 @@ This project is built using the following technologies:
 3. Build the project:
 
     ```bash
-    gradlew build
+    gradlew clean build
     ```
 
 4. Run the application using Docker Compose:
